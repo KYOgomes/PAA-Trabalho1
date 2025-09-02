@@ -1,3 +1,6 @@
+#ifndef IMAGEDESCRIPTOR_HPP
+#define IMAGEDESCRIPTOR_HPP
+
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <vector>
@@ -63,26 +66,4 @@ Descriptor computeDescriptor(const cv::Mat& image) {
     return {hist, muH, muS};
 }
 
-int main(int argc, char** argv) {
-    if (argc < 2) {
-        std::cout << "Uso: " << argv[0] << " <imagem>" << std::endl;
-        return -1;
-    }
-
-    cv::Mat img = cv::imread(argv[1]);
-    if (img.empty()) {
-        std::cerr << "Erro ao carregar a imagem!" << std::endl;
-        return -1;
-    }
-
-    Descriptor d = computeDescriptor(img);
-
-    std::cout << "Histograma (" << d.hist.size() << " bins):\n";
-    for (size_t i = 0; i < d.hist.size(); i++) {
-        std::cout << d.hist[i] << " ";
-    }
-    std::cout << "\nMédia Hue = " << d.muH
-              << " | Média Saturação = " << d.muS << std::endl;
-
-    return 0;
-}
+#endif // IMAGEDESCRIPTOR_HPP
