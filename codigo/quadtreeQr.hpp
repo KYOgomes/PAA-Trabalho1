@@ -1,3 +1,4 @@
+#pragma once
 #include "quadtree.hpp"
 
 Quadtree::Quadtree(Rect boundary, int capacity)
