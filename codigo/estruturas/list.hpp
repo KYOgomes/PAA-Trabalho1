@@ -1,5 +1,5 @@
 #pragma once
-#include "descritor.hpp"
+#include "../descritor/descritor.hpp"
 #include <vector>
 #include <cmath>
 #include <algorithm>

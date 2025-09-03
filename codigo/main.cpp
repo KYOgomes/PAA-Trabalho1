@@ -1,6 +1,7 @@
-#include "imagedescriptor.hpp"
-#include "list.hpp"
-#include "quadtreeQr.hpp"
+#include "descritor/imagedescriptor.hpp"
+#include "estruturas/list.hpp"
+#include "estruturas/quadtree.hpp"
+#include "estruturas/hash.hpp"
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <filesystem>
@@ -95,6 +96,35 @@ void runQuadtree(const std::string& queryPath, int K) {
     }
 }
 
+// --- Busca com Hash ---
+void runHash(const std::string& queryPath, int K) {
+    HashIndex hindex;
+
+    for (const auto& entry : fs::directory_iterator("images")) {
+        if (entry.is_regular_file()) {
+            cv::Mat img = loadImage(entry.path().string());
+            if (img.empty()) continue;
+
+            Descriptor d = computeDescriptor(img);
+            Record r{0, entry.path().string(), d.hist, d.muH, d.muS};
+            hindex.add(r, d);
+        }
+    }
+
+    cv::Mat qimg = loadImage(queryPath);
+    if (qimg.empty()) return;
+
+    Descriptor dq = computeDescriptor(qimg);
+    Record rq{0, queryPath, dq.hist, dq.muH, dq.muS};
+
+    auto results = hindex.query(rq, dq, K);
+
+    std::cout << "Resultados (Hash):\n";
+    for (auto& r : results) {
+        std::cout << r.filepath << "\n";
+    }
+}
+
 int main(int argc, char** argv) {
     if (argc < 2) {
         std::cout << "Uso: " << argv[0] << " <imagem_query>" << std::endl;
@@ -107,6 +137,7 @@ int main(int argc, char** argv) {
     std::cout << "Escolha o método:\n";
     std::cout << "1 - Lista Sequencial\n";
     std::cout << "2 - Quadtree\n";
+    std::cout << "3 - Hash\n";
     int choice;
     std::cin >> choice;
 
@@ -114,6 +145,8 @@ int main(int argc, char** argv) {
         runList(queryPath, K);
     } else if (choice == 2) {
         runQuadtree(queryPath, K);
+    } else if (choice == 3) {
+        runHash(queryPath, K);
     } else {
         std::cout << "Opção inválida.\n";
     }
